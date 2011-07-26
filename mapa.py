@@ -28,10 +28,10 @@ parser.add_argument('-t', action='store', dest='tipo_mapa',help='Mapas disponibl
 parser.add_argument('-c',action='store', dest='calibracion',default='kml',help='Calibración del mapa [txt|imp|KML] para GpsCycleComputer, Compegps o GoogleEarth respectivamente')
 parser.add_argument('-gcc',action='store_true', dest='gpscyclecomputer',help='genera el mapa en trozos para GpsCycleComputer')
 parser.add_argument('-b',action='store', dest='buscar',help='Busca un mapa en la base de datos por nombre de población')
-parser.add_argument('-geoname',action='store', dest='nomgeo',help='Busca nombre de accidente geográfico')
+parser.add_argument('-geoname',action='store', dest='nomgeo',help='Busca nombre de accidente geográfico(sin implemntar todavia)')
 parser.add_argument('-e',action='store', dest='escala',help='Escala del mapa.[25 | 50 | 100 | 200 | All]')
 parser.add_argument('-fc',action='store', dest='filacolumna',help='fila columna de la cuadricula MTN50',nargs=2,type=int)
-parser.add_argument('-hoja',action='store', dest='hoja_mtn50',help='Especificar mapa por el numero de hoja de la cuadricula MTN50',nargs=1,type=int)
+parser.add_argument('-hoja',action='store', dest='hoja_mtn50',help='Especificar mapa por el numero de hoja de la cuadricula MTN50',type=int)
 parser.add_argument('-png',action='store_true', dest='png',help='Crear imagen png en vez de jpg', default=False)
 
 args = parser.parse_args()
@@ -77,6 +77,7 @@ if (args.filacolumna):
 	cc=int(args.filacolumna[1])
 
 if (args.hoja_mtn50):
+	print int(args.hoja_mtn50)
 	(cc,ff)=cuadricula.ign.MTN50_N(args.hoja_mtn50)
 	args.escala=50
 	zoom=15

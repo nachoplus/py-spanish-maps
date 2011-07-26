@@ -1,0 +1,120 @@
+<html>
+<head>
+    <title>Nacho PNOA Map</title>
+ 
+    <!-- bring in the OpenLayers javascript library
+         (here we bring it from the remote site, but you could
+         easily serve up this javascript yourself) -->
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+ 
+    <!-- bring in the OpenStreetMap OpenLayers layers.
+         Using this hosted file will make sure we are kept up
+         to date with any necessary changes -->
+    <script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>
+
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAlFdF-GAwkjA65aJTMaceRRRiu-xDvxsROaJiC1O-fJD3F8_uXBRAGWNepJCGYRNg9mmUGS0qtqOh1g" type="text/javascript"> </script> 
+
+ 
+    <script type="text/javascript">
+        // Start position for the map (hardcoded here for simplicity)
+        var lat=40.33333;	
+        var lon=-3.52083;
+        var zoom=10;
+ 
+        var map; //complex object of type OpenLayers.Map
+ 
+        //Initialise the 'map' object
+        function init() {
+ 
+            map = new OpenLayers.Map ('map', {
+                controls:[
+                    new OpenLayers.Control.Navigation(),
+                    new OpenLayers.Control.PanZoomBar(),
+		    new OpenLayers.Control.LayerSwitcher(),
+                    new OpenLayers.Control.Attribution()],
+                maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
+                maxResolution: 156543.0399,
+                numZoomLevels: 18,
+                units: 'm',
+                projection: new OpenLayers.Projection("EPSG:900913"),
+                displayProjection: new OpenLayers.Projection("EPSG:4326")
+            } );
+ 
+ 
+            // Define the map layer
+            // Other defined layers are OpenLayers.Layer.OSM.Mapnik, OpenLayers.Layer.OSM.Maplint and OpenLayers.Layer.OSM.CycleMap
+		var pnoa = new OpenLayers.Layer.OSM("pnoa", "http://192.168.0.12/PNOA-ORTO/${z}/${x}/${y}.png", {numZoomLevels: 21});
+	 	map.addLayer(pnoa);
+
+		var mtn = new OpenLayers.Layer.OSM("mtn", "http://192.168.0.12/MTN-RASTER/${z}/${x}/${y}.png", {numZoomLevels: 16});
+	 	map.addLayer(mtn);
+
+		var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik");
+		map.addLayer(layerMapnik);
+
+		var layerTilesAtHome = new OpenLayers.Layer.OSM.Osmarender("Osmarender");
+		map.addLayer(layerTilesAtHome);
+
+		var layerCycleMap = new OpenLayers.Layer.OSM.CycleMap("CycleMap");
+		map.addLayer(layerCycleMap);
+	
+		var jpl_wms = new OpenLayers.Layer.WMS( "NASA Global Mosaic",
+			"http://t1.hypercube.telascience.org/cgi-bin/landsat7", 
+			{layers: "landsat7"}
+		);
+
+		map.addLayer(jpl_wms);
+
+		var catastro = new OpenLayers.Layer.WMS("Catastro",
+			"http://ovc.catastro.meh.es/Cartografia/WMS/ServidorWMS.aspx?",
+			{transparent: 'true'} 
+		);
+		map.addLayer(catastro);
+
+
+		var gphy = new OpenLayers.Layer.Google(
+	                "Google Physical",{'sphericalMercator': true,
+	                type: G_PHYSICAL_MAP,numZoomLevels: 20}
+	        );
+            	var gmap = new OpenLayers.Layer.Google(
+                	"Google Streets",{'sphericalMercator': true, 
+                	numZoomLevels: 20}
+            	);
+            	var ghyb = new OpenLayers.Layer.Google(
+                	"Google Hybrid",{'sphericalMercator': true,
+                	type: G_HYBRID_MAP, numZoomLevels: 20}
+            	);
+            	var gsat = new OpenLayers.Layer.Google(
+                	"Google Satellite",{'sphericalMercator': true,
+                	type: G_SATELLITE_MAP, numZoomLevels: 20}
+            	);
+
+            	map.addLayers([gphy, gmap, ghyb, gsat]);
+
+//            map.addLayer(new OpenLayers.Layer.GML("RdT", "red.kml", 
+//               {
+//                format: OpenLayers.Format.KML, 
+//                formatOptions: {
+//                  extractStyles: true, 
+//                  extractAttributes: true,
+//                }
+//               }));
+
+            if( ! map.getCenter() ){
+                var lonLat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), map.getProjectionObject());
+                map.setCenter (lonLat, zoom);
+            }
+        }
+ 
+    </script>
+</head>
+ 
+<!-- body.onload is called once the page is loaded (call the 'init' function) -->
+<body onload="init();">
+ 
+    <!-- define a DIV into which the map will appear. Make it take up the whole window -->
+    <div style="width:100%; height:100%" id="map"></div>
+ 
+</body>
+ 
+</html>

@@ -19,7 +19,7 @@ class cuadricula_slippy:
 		self.tipo=tipo
 	    	if not os.path.isdir(self.dirbase):
 	        	os.mkdir(self.dirbase)
-		for z in range(1,19):
+		for z in range(1,21):
         		zoom = "%s" % z
         		if not os.path.isdir(self.dirbase+"/" + zoom):
             			os.mkdir(self.dirbase +"/"+ zoom)
@@ -254,11 +254,11 @@ class cuadricula_slippy:
 				else:
 					return None
 		else:
-			#zooms nativos 15->MTN50 13 ->MTN200 10->MTN1000				
-			if  zoom == 17:
+			#zooms nativos 		
+			if  zoom == 13 or zoom == 20:
 				#factor=0.95
 				factor=1
-			if  zoom <> 17 :
+			if  zoom <> 13 and zoom<>20:
 				print "MERGING FROM LOW LEVEL TILES:",zoom+1
 				return self.get_from_low_zoom_level((xtile,ytile),zoom)
 			nTile=6			
