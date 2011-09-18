@@ -17,7 +17,7 @@ TiposDeMapasStr= TiposDeMapasStr+']'
 parser = argparse.ArgumentParser(description='Descarga las teselas de los mapas los datos mapas RASTER del Instituto Geográfico Nacional, mapas del OpenStreetMap o composiciones de ortofotos basados en PNOA',epilog='2011. Nacho Mas')
 
 parser.add_argument('-t', action='store', dest='tipo_mapa',help='Mapas disponibles:'+TiposDeMapasStr)
-parser.add_argument('-n', action='store', dest='numtiles15',default=1,help='Area expresada en numero de teselas del zoom=15')
+parser.add_argument('-n', action='store', dest='numtiles20',default=1,help='Area expresada en numero de teselas del zoom=20')
 parser.add_argument('lat',action='store',help='Latitud y longitud del punto central',type=float)
 parser.add_argument('lon',action='store',help='Latitud y longitud del punto central',type=float)
 
@@ -45,7 +45,7 @@ else:
 
 #Descargo los nativos
 for zoom in zoomsNativos:
-	n=int(args.numtiles15)/2**(15-zoom)	
+	n=int(args.numtiles20)/2**(20-zoom)	
 	print "Zoom:",zoom,"Tiles",n
 	(xtile0,ytile0)=mapa.deg2num(args.lon,args.lat, zoom)
 	for xtile in range(xtile0-n,xtile0+n):
@@ -55,7 +55,7 @@ for zoom in zoomsNativos:
 #Descargo el resto
 print restOfZoom
 for zoom in restOfZoom:
-	n=int(args.numtiles15)/2**(15-zoom)	
+	n=int(args.numtiles20)/2**(20-zoom)	
 	print "Zoom:",zoom,"Tiles",n
 	(xtile0,ytile0)=mapa.deg2num(args.lon,args.lat, zoom)
 	for xtile in range(xtile0-n,xtile0+n):

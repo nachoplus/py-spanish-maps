@@ -92,6 +92,7 @@ class cuadricula_slippy:
 		y_n=ytile1-ytile0+1
 		print x_n,y_n
 		size=(self.imgx*x_n,self.imgy*y_n)
+		print size
 		Im=Image.new("RGB",size,"#FFFFFF")
 		for i in range(x_n):
 			x0=self.imgx*(i)

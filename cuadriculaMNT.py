@@ -72,10 +72,11 @@ class ign_db:
 	self.mark.execute(SQLString)
 	record=self.mark.fetchall()
 	for i in record:
-		print "nombre:",i[0]
+		nombre=i[0].encode('utf-8')
+		print "nombre:",nombre
 		print "Hoja:",int(i[1])
 		self.hoja=int(i[1])
-		self.nombre="MTN50_HOJA_"+str(int(i[1]))+"["+str(cc)+"-"+str(ff)+"]("+str(i[0])+")"
+		self.nombre="MTN50_HOJA_"+str(int(i[1]))+"["+str(cc)+"-"+str(ff)+"]("+str(nombre)+")"
 
 
      def MTN50_N(self,numero):
@@ -84,12 +85,13 @@ class ign_db:
 	self.mark.execute(SQLString)
 	record=self.mark.fetchall()
 	for i in record:
-		print "nombre:",i[0]
+		nombre=i[0].encode('utf-8')
+		print "nombre:",nombre
 		print "cuadricula:",int(i[1])
 		(kk1,kk2,kk3)=i[2].partition('-')
 		ff=int(kk1)
 		cc=int(kk3)
-		self.nombre="MTN50 HOJA_"+str(int(i[1]))+"["+str(cc)+"-"+str(ff)+"]("+str(i[0])+")"
+		self.nombre="MTN50 HOJA_"+str(int(i[1]))+"["+str(cc)+"-"+str(ff)+"]("+str(nombre)+")"
 	return (cc,ff)
 
 
@@ -212,6 +214,7 @@ class cuadricula_MNT():
 	ny=nx*2.0
         cc=int((cc0.x-self.lon_org)*nx)+1
         ff=int((self.lat_org-cc0.y)*ny)+1
+        print cc0.x,self.lon_org,self.lat_org,cc0.y
         print nx,ny,cc0.x-self.lon_org,self.lat_org-cc0.y
         print 'escala,fila.columna:',escala,cc,ff
 	self.coord_MNT(escala,cc,ff)

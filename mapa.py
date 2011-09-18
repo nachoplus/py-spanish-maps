@@ -33,6 +33,8 @@ parser.add_argument('-e',action='store', dest='escala',help='Escala del mapa.[25
 parser.add_argument('-fc',action='store', dest='filacolumna',help='fila columna de la cuadricula MTN50',nargs=2,type=int)
 parser.add_argument('-hoja',action='store', dest='hoja_mtn50',help='Especificar mapa por el numero de hoja de la cuadricula MTN50',type=int)
 parser.add_argument('-png',action='store_true', dest='png',help='Crear imagen png en vez de jpg', default=False)
+parser.add_argument('-latlon',action='store',dest='latlon',help='Busca por Latitud y longitud del punto central',nargs=2,type=float)
+
 
 args = parser.parse_args()
 
@@ -48,6 +50,13 @@ if (args.buscar):
 #Busco en la base de datos y devuelvo el resultado
 if (args.nomgeo):
 	cuadricula.ign.nomgeo(args.nomgeo)
+	quit()
+
+if (args.latlon):
+	se=coord(args.latlon[1],args.latlon[0])
+	print se.grad()
+	(cc,ff)=cuadricula.cuadricula(50,se)	
+	cuadricula.ign.MTN50(cc,ff)
 	quit()
 
 #defino el tipo de mapa a generar
