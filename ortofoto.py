@@ -32,7 +32,7 @@ if args.tipo_mapa in (TiposDeMapas):
 	if args.tipo_mapa=='MTN-RASTER':
 		zoom=15
 	if args.tipo_mapa=='PNOA-ORTO':
-		zoom=20
+		zoom=18
 	mapa=cuadricula_slippy(args.tipo_mapa)
 else:
 	print "Tipos de mapas disponibles " + TiposDeMapasStr

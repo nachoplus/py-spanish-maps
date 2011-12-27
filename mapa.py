@@ -13,7 +13,7 @@ for tipo in TiposDeMapas:
 TiposDeMapasStr=TiposDeMapasStr[0:-1]
 TiposDeMapasStr= TiposDeMapasStr+']'
 
-TiposDeCalibracion=('kml','txt','imp')
+TiposDeCalibracion=('kml','txt','imp','uiview','xastir','sondemonitor')
 TiposDeCalibracionStr='[' 
 for tipo in TiposDeCalibracion:
 	TiposDeCalibracionStr= TiposDeCalibracionStr+tipo+'|'
@@ -25,12 +25,13 @@ TiposDeCalibracionStr= TiposDeCalibracionStr+']'
 parser = argparse.ArgumentParser(description='Genera varios tipos de mapas usando la cuadricula MTN50 y derivadas. Los mapas los datos mapas RASTER del Instituto Geográfico Nacional, mapas del OpenStreetMap o composiciones de ortofotos basados en PNOA',epilog='2011. Nacho Mas')
 
 parser.add_argument('-t', action='store', dest='tipo_mapa',help='Mapas disponibles:'+TiposDeMapasStr)
-parser.add_argument('-c',action='store', dest='calibracion',default='kml',help='Calibración del mapa [txt|imp|KML] para GpsCycleComputer, Compegps o GoogleEarth respectivamente')
+parser.add_argument('-c',action='store', dest='calibracion',default='kml',help='Calibración del mapa [txt|imp|KML|uiview|xastir|sondemonitor] para GpsCycleComputer, Compegps, GoogleEarth, uiview,xastir o sondemonitor respectivamente')
 parser.add_argument('-gcc',action='store_true', dest='gpscyclecomputer',help='genera el mapa en trozos para GpsCycleComputer')
 parser.add_argument('-b',action='store', dest='buscar',help='Busca un mapa en la base de datos por nombre de población')
-parser.add_argument('-geoname',action='store', dest='nomgeo',help='Busca nombre de accidente geográfico(sin implemntar todavia)')
+parser.add_argument('-geoname',action='store', dest='nomgeo',help='Busca nombre de accidente geográfico(sin implementar todavia)')
 parser.add_argument('-e',action='store', dest='escala',help='Escala del mapa.[25 | 50 | 100 | 200 | All]')
-parser.add_argument('-fc',action='store', dest='filacolumna',help='fila columna de la cuadricula MTN50',nargs=2,type=int)
+parser.add_argument('-q',action='store', dest='calidad',default=100,help='calidad del mapa 30-100',type=float)
+parser.add_argument('-cf',action='store', dest='filacolumna',help='columna filade la cuadricula MTN50',nargs=2,type=int)
 parser.add_argument('-hoja',action='store', dest='hoja_mtn50',help='Especificar mapa por el numero de hoja de la cuadricula MTN50',type=int)
 parser.add_argument('-png',action='store_true', dest='png',help='Crear imagen png en vez de jpg', default=False)
 parser.add_argument('-latlon',action='store',dest='latlon',help='Busca por Latitud y longitud del punto central',nargs=2,type=float)
@@ -128,15 +129,34 @@ if (args.gpscyclecomputer):
 			c1.y=c0.y+ydelta
 			print i,j,c0.x,c0.y,c1.x,c1.y
 			im=mapa.get_bbox_lonlat((c0.x,c0.y),(c1.x,c1.y),zoom)
-			fi="GPSCYCLE_"+str(i)+"_"+str(j)+"_"+f+exten
-			fichero=fi.upper()
+			fichero="TILE_"+str(i)+"_"+str(j)+"_"+f+exten
+			#fichero=fi.upper()
 			im.save(fichero,formato)
-			calibr=calibrador(("GPSCYCLE_"+str(i)+"_"+str(j)+"_"+f).upper(),im.size,(c0,c1))
-			calibr.write_txt()
+			calibr=calibrador(("TILE_"+str(i)+"_"+str(j)+"_"+f).upper(),im.size,(c0,c1))
+			if args.calibracion=='kml':
+				calibr.write_kml()
+			if args.calibracion=='txt':
+				calibr.write_txt()
+			if args.calibracion=='imp':
+				calibr.write_imp()
+			if args.calibracion=='uiview':
+				calibr.write_uiview()
+			if args.calibracion=='sondemonitor':
+				calibr.write_sondemonitor()
+			if args.calibracion=='xastir':
+				calibr.write_xastir()
 	quit()
 
 
-im=mapa.get_bbox_lonlat((no.x,no.y),(se.x,se.y),zoom)
+imm=mapa.get_bbox_lonlat((no.x,no.y),(se.x,se.y),zoom)
+q=args.calidad 
+if (q==100):
+	im=imm
+else:
+	(xsize,ysize)=imm.size
+        newsize=(xsize*(q/100),ysize*(q/100))
+	print q,imm.size,newsize
+	im=imm.resize(newsize)
 im.save(f+exten,formato)
 calibr=calibrador(f,im.size,(se,no))
 
@@ -147,7 +167,12 @@ if args.calibracion=='txt':
 	calibr.write_txt()
 if args.calibracion=='imp':
 	calibr.write_imp()
-
+if args.calibracion=='uiview':
+	calibr.write_uiview()
+if args.calibracion=='sondemonitor':
+	calibr.write_sondemonitor()
+if args.calibracion=='xastir':
+	calibr.write_xastir()
 
 
 

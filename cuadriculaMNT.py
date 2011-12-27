@@ -6,7 +6,7 @@
 from pysqlite2 import dbapi2 as sqlite
 import sys, os,  pyproj
 import pyexiv2
-
+import re
 
 
 
@@ -29,6 +29,50 @@ class coord:
 
      def grad(self):
 	print "G:"+self.grados(self.x), self.grados(self.y)
+
+     def grados_uiview(self,lat_lon):
+        if lat_lon=='lon':
+		x=self.x
+	        if (x/abs(x)==1):
+			flag='E'
+		else:
+			flag='W' 
+                fmtStr="%03u.%02u.%02u%s"
+        else:
+		x=self.y
+	        if (x/abs(x)==1):
+			flag='N'
+		else:
+			flag='S' 
+                fmtStr="%02u.%02u.%02u%s"
+	g=int(x)
+	s=(x-g)*3600
+	m=int(s/60)
+	s=int((s-m*60)*100)/100
+	t=fmtStr % (abs(g),abs(m),abs(s),flag)
+        return t 
+
+     def grados_sondemonitor(self,lat_lon):
+        if lat_lon=='lon':
+		x=self.x
+	        if (x/abs(x)==1):
+			flag='E'
+		else:
+			flag='W' 
+                fmtStr="%03u,%07.4f,%s"
+        else:
+		x=self.y
+	        if (x/abs(x)==1):
+			flag='N'
+		else:
+			flag='S' 
+                fmtStr="%02u,%07.4f,%s"
+	g=int(x)
+	s=(x-g)*3600
+	m=s/60
+	t=fmtStr % (abs(g),abs(m),flag)
+        return t 
+
 
 
 #Conecta con la BD para conseguir los nombres de las cuadriculas
@@ -76,7 +120,8 @@ class ign_db:
 		print "nombre:",nombre
 		print "Hoja:",int(i[1])
 		self.hoja=int(i[1])
-		self.nombre="MTN50_HOJA_"+str(int(i[1]))+"["+str(cc)+"-"+str(ff)+"]("+str(nombre)+")"
+		self.nombre="MTN50_HOJA_"+str(int(i[1]))+"["+str(cc)+"-"+str(ff)+"]("+str(nombre).replace(" ","_")+")"
+		#self.nombre="MTN50_"+str(nombre)
 
 
      def MTN50_N(self,numero):
@@ -91,7 +136,8 @@ class ign_db:
 		(kk1,kk2,kk3)=i[2].partition('-')
 		ff=int(kk1)
 		cc=int(kk3)
-		self.nombre="MTN50 HOJA_"+str(int(i[1]))+"["+str(cc)+"-"+str(ff)+"]("+str(nombre)+")"
+		self.nombre="MTN50 HOJA_"+str(int(i[1]))+"["+str(cc)+"-"+str(ff)+"]("+str(nombre).replace(" ","_")+")"
+		#self.nombre="MTN50_"+str(nombre)
 	return (cc,ff)
 
 
@@ -298,6 +344,36 @@ class calibrador:
 	dummy=dummy+''+str(self.no.y)+'\n'#'</north>'
 	dummy=dummy+''+str(self.se.x)+'\n'#'</east>'
        	f=open(self.nombre+".txt",'w')
+       	f.write(dummy)
+       	f.close()
+
+     def write_uiview(self):             
+	dummy=self.no.grados_uiview('lat')+', '+self.no.grados_uiview('lon')+'\r\n'
+	dummy=dummy+self.se.grados_uiview('lat')+', '+self.se.grados_uiview('lon')+'\r\n'
+	dummy=dummy+self.nombre
+        print dummy
+       	f=open(self.nombre+".INF",'w')
+       	f.write(dummy)
+       	f.close()
+
+     def write_xastir(self):
+	dummy='FILENAME '+self.nombre+'.jpg\n'
+	dummy=dummy+'#          x          y        lon         lat\n'
+	dummy=dummy+'TIEPOINT   1          1    '+str(self.no.x)+'  '+str(self.no.y)+'\n'
+	dummy=dummy+'TIEPOINT  '+ str(self.xsize)+'    '+str(self.ysize)+' '+str(self.se.x)+'  '+str(self.se.y)+'\n'
+	dummy=dummy+'IMAGESIZE '+str(self.xsize)+'    '+str(self.ysize)
+        print dummy
+       	f=open(self.nombre+".geo",'w')
+       	f.write(dummy)
+       	f.close()
+
+     def write_sondemonitor(self):             
+	dummy='Point00,xy,0,0,in,deg,'+self.no.grados_sondemonitor('lat')+', '+self.no.grados_sondemonitor('lon')+'\r\n'
+	dummy=dummy+'Point01,xy,'+str(self.xsize)+','+str(self.ysize)+',in,deg,'+self.se.grados_sondemonitor('lat')+', '+self.se.grados_sondemonitor('lon')+'\r\n'
+	dummy=dummy+'Point02,xy,0,'+str(self.ysize)+',in,deg,'+self.se.grados_sondemonitor('lat')+', '+self.no.grados_sondemonitor('lon')+'\r\n'
+	dummy=dummy+'Point03,xy,'+str(self.xsize)+',0,in,deg,'+self.no.grados_sondemonitor('lat')+', '+self.se.grados_sondemonitor('lon')+'\r\n'
+        print dummy
+       	f=open(self.nombre+".clb",'w')
        	f.write(dummy)
        	f.close()
 		
